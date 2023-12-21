@@ -14,11 +14,16 @@ const usersSchema = new Schema(
     },
     username: {
       type: String,
+      required: [true, "Username is required"],
     },
     gender: {
       type: String,
       enum: ["man", "girl"],
-      default: "man",
+      default: "girl",
+      required: [true, "Avatar is required"],
+    },
+    dailyNorma: {
+      type: String,
     },
     avatarURL: {
       type: String,
