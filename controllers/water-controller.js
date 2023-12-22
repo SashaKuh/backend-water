@@ -1,6 +1,4 @@
 import { ctrlWrapper, httpError } from "../decorators/index.js";
-import User from "../models/users.js";
-import Entry from "../models/water.js";
 
 const rateDaily = async (req, res, next) => {
   /**const {dailyNorma} = req.body

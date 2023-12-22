@@ -19,7 +19,7 @@ const entrySchema = new Schema(
       required: [true, "value is required."],
     },
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 );
 
 const Entry = model("entry", entrySchema);
