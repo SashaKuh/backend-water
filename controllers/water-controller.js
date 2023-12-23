@@ -25,7 +25,6 @@ const editEntry = async (req, res, next) => {
     { _id: entryId, owner },
     req.body
   );
-  console.log(result);
   if (!result) {
     return next(httpError(404, "Not found"));
   }
