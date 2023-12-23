@@ -8,8 +8,11 @@ import {
   waterEditSchema,
 } from "../schemas/water-shemas.js";
 import { isValidId } from "../helpers/index.js";
+import { authenticate } from "../middlewars/index.js";
 
 const waterRoute = express.Router();
+
+waterRoute.use(authenticate);
 
 waterRoute.patch(
   "/rate",
