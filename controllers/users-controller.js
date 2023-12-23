@@ -32,18 +32,52 @@ const signup = async (req, res, next) => {
     expiresIn: "23h",
   });
 
-  const addToken = await User.findByIdAndUpdate(
+  const userWithToken = await User.findByIdAndUpdate(
     newUser._id,
-    { token: token },
+    { token },
     { returnDocument: "after" }
   );
 
   res.status(201).json({
-    email: newUser.email,
-    username: newUser.username,
-    avatarURL: newUser.avatarURL,
-    token: addToken.token,
+    email: userWithToken.email,
+    username: userWithToken.username,
+    avatarURL: userWithToken.avatarURL,
+    dailyNorma: userWithToken.dailyNorma,
+    token: userWithToken.token,
   });
 };
 
-export default { signup: ctrlWrapper(signup) };
+const signin = async (req, res, next) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw httpError(401, "Email or password is wrong");
+  }
+
+  const match = await bcrypt.compare(password, user.password);
+
+  if (!match) {
+    throw httpError(401, "Email or password is wrong");
+  }
+
+  const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+    expiresIn: "23h",
+  });
+
+  const userWithToken = await User.findByIdAndUpdate(
+    user._id,
+    { token },
+    { returnDocument: "after" }
+  );
+
+  res.status(200).json({
+    email: userWithToken.email,
+    username: userWithToken.username,
+    avatarURL: userWithToken.avatarURL,
+    dailyNorma: userWithToken.dailyNorma,
+    token: userWithToken.token,
+  });
+};
+
+export default { signup: ctrlWrapper(signup), signin: ctrlWrapper(signin) };
