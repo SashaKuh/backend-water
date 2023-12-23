@@ -8,9 +8,9 @@ export const authUserSchema = Joi.object({
     "any.required": "Email is required field",
     "string.base": "Email must be a string",
   }),
-  password: Joi.string().required().min(8).max(48).messages({
+  password: Joi.string().required().min(8).max(64).messages({
     "string.min": "Min length 8 symbols",
-    "string.max: ": "Max length 48 symbols",
+    "string.max: ": "Max length 64 symbols",
     "any.required": "Password is required field",
     "string.base": "Password must be a string",
   }),

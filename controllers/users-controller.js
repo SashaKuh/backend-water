@@ -80,4 +80,20 @@ const signin = async (req, res, next) => {
   });
 };
 
-export default { signup: ctrlWrapper(signup), signin: ctrlWrapper(signin) };
+const signout = async (req, res, next) => {
+  const { _id } = req.user;
+
+  const result = await User.findByIdAndUpdate(_id, { token: "" });
+
+  if (!result) {
+    throw httpError(401, "Not authorized");
+  }
+
+  res.status(204).send();
+};
+
+export default {
+  signup: ctrlWrapper(signup),
+  signin: ctrlWrapper(signin),
+  signout: ctrlWrapper(signout),
+};
