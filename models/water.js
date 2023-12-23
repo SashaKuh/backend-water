@@ -18,6 +18,10 @@ const entrySchema = new Schema(
       ],
       required: [true, "value is required."],
     },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
+    },
   },
   { versionKey: false, timestamps: true }
 );
