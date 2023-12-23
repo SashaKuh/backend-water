@@ -9,19 +9,28 @@ const rateDaily = async (req, res) => {
     if (!result) {
     return next(httpError(404, "Not found"));
    }
-   res.json({
-    message: "Successfully updated"
-   })
+   res.json(result)
    */
 };
 
 const addEntry = async (req, res) => {
   // const {id: owner} = req.user;
-  await Entry.create({ ...req.body });
-  res.status(201).send();
+  const result = await Entry.create({ ...req.body });
+  res.json(result);
+};
+
+const editEntry = async (req, res) => {
+  const { entryId } = req.params;
+  // const {id: owner} = req.user;
+  const result = await Entry.findByIdAndUpdate(entryId, req.body);
+  if (!result) {
+    return next(httpError(404, "Not found"));
+  }
+  res.json(result);
 };
 
 export default {
   rateDaily: ctrlWrapper(rateDaily),
   addEntry: ctrlWrapper(addEntry),
+  editEntry: ctrlWrapper(editEntry),
 };

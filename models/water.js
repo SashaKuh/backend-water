@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import { handleSaveError, enableUpdateOptions } from "./hooks.js";
 
 const dateRegExp = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
 
@@ -25,6 +26,11 @@ const entrySchema = new Schema(
   },
   { versionKey: false, timestamps: true }
 );
+
+entrySchema.post("save", handleSaveError);
+
+entrySchema.pre("findOneAndUpdate", enableUpdateOptions);
+entrySchema.post("findOneAndUpdate", handleSaveError);
 
 const Entry = model("entry", entrySchema);
 

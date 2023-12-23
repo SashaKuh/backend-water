@@ -2,7 +2,12 @@ import express from "express";
 import waterController from "../controllers/water-controller.js";
 import { validateBody } from "../decorators/index.js";
 import { isEmptyBody } from "../helpers/index.js";
-import { waterEntrySchema, waterDailySchema } from "../schemas/water-shemas.js";
+import {
+  waterEntrySchema,
+  waterDailySchema,
+  waterEditSchema,
+} from "../schemas/water-shemas.js";
+import { isValidId } from "../helpers/index.js";
 
 const waterRoute = express.Router();
 
@@ -18,6 +23,14 @@ waterRoute.post(
   isEmptyBody,
   validateBody(waterEntrySchema),
   waterController.addEntry
+);
+
+waterRoute.put(
+  "/:entryId",
+  isValidId,
+  isEmptyBody,
+  validateBody(waterEditSchema),
+  waterController.editEntry
 );
 
 export default waterRoute;
