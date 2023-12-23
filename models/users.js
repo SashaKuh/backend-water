@@ -22,8 +22,10 @@ const usersSchema = new Schema(
       required: [true, "Gender is required"],
     },
     dailyNorma: {
-      type: String,
-      default: "1.5",
+      type: Number,
+      default: 2000,
+      max: 15000,
+      min: 0,
     },
     avatarURL: {
       type: String,
