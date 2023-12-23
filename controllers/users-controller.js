@@ -42,6 +42,7 @@ const signup = async (req, res, next) => {
     email: newUser.email,
     username: newUser.username,
     avatarURL: newUser.avatarURL,
+    dailyNorma: newUser.dailyNorma,
     token: addToken.token,
   });
 };
