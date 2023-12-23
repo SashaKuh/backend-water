@@ -37,7 +37,6 @@ const signup = async (req, res, next) => {
     { token: token },
     { returnDocument: "after" }
   );
-  console.log(addToken);
 
   res.status(201).json({
     email: newUser.email,
