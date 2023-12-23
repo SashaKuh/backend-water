@@ -33,4 +33,6 @@ waterRoute.put(
   waterController.editEntry
 );
 
+waterRoute.delete("/:entryId", isValidId, waterController.deleteEntry);
+
 export default waterRoute;
