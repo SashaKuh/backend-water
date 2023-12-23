@@ -1,5 +1,4 @@
 import { Schema, model } from "mongoose";
-import { stringify } from "querystring";
 
 const usersSchema = new Schema(
   {
@@ -20,16 +19,19 @@ const usersSchema = new Schema(
       type: String,
       enum: ["man", "girl"],
       default: "girl",
-      required: [true, "Avatar is required"],
+      required: [true, "Gender is required"],
     },
     dailyNorma: {
       type: String,
+      default: "1.5",
     },
     avatarURL: {
       type: String,
+      required: [true, "Avatar is required"],
     },
     token: {
       type: String,
+      default: null,
     },
   },
   { versionKey: false, timestamps: true }
