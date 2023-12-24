@@ -109,6 +109,11 @@ const current = async (req, res, next) => {
 const updateUserData = async (req, res, next) => {
   const { body } = req;
   const { _id } = req.user;
+
+  if (body.password) {
+    body.password = await bcrypt.hash(body.password, 10);
+  }
+
   const result = await User.findByIdAndUpdate(
     _id,
     { ...body },
