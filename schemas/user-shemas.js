@@ -15,3 +15,19 @@ export const authUserSchema = Joi.object({
     "string.base": "Password must be a string",
   }),
 });
+
+export const userUpdateSchema = Joi.object({
+  password: Joi.string().min(8).max(64).messages({
+    "string.min": "Min length 8 symbols",
+    "string.max: ": "Max length 64 symbols",
+    "string.base": "Password must be a string",
+  }),
+  username: Joi.string().max(32).messages({
+    "string.max: ": "Max length 32 symbols",
+    "string.base": "Username must be a string",
+  }),
+  gender: Joi.string().valid("man", "girl").messages({
+    "any.only": "The value must be either 'man' or 'girl'",
+    "string.base": "Gender must be a string",
+  }),
+});

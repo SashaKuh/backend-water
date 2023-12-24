@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import gravatar from "gravatar";
 import jwt from "jsonwebtoken";
+import { v2 as cloudinary } from "cloudinary";
 import "dotenv/config.js";
 import { ctrlWrapper, httpError } from "../decorators/index.js";
 import User from "../models/users.js";
@@ -92,8 +93,47 @@ const signout = async (req, res, next) => {
   res.status(204).send();
 };
 
+const current = async (req, res, next) => {
+  const { _id } = req.user;
+  const result = await User.findById(_id);
+
+  if (!result) {
+    throw httpError(401, "Not authorized");
+  }
+  const { email, username, avatarURL, dailyNorma } = result;
+
+  res.status(200).json({ email, username, avatarURL, dailyNorma });
+};
+
+// temp
+const updateUserData = async (req, res, next) => {
+  const { body } = req;
+  const { _id } = req.user;
+  const result = await User.findByIdAndUpdate(
+    _id,
+    { ...body },
+    { returnDocument: "after" }
+  );
+
+  if (!result) {
+    httpError(401, "Not authorized");
+  }
+
+  const { email, username, avatarURL, dailyNorma } = result;
+
+  res.status(200).json({ email, username, avatarURL, dailyNorma });
+};
+
+const updateAvatar = (req, res, next) => {
+  cloudinary.uploader
+    .upload("my_image.jpg")
+    .then((result) => console.log(result));
+};
+
 export default {
   signup: ctrlWrapper(signup),
   signin: ctrlWrapper(signin),
   signout: ctrlWrapper(signout),
+  current: ctrlWrapper(current),
+  updateUserData: ctrlWrapper(updateUserData),
 };
