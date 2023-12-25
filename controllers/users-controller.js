@@ -7,7 +7,7 @@ import fs from "fs/promises";
 import { ctrlWrapper, httpError } from "../decorators/index.js";
 import User from "../models/users.js";
 
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET, CLOUDINARY_PHOTO_BASE } = process.env;
 
 const signup = async (req, res, next) => {
   const { email, password } = req.body;
@@ -161,7 +161,7 @@ const updateAvatar = async (req, res, next) => {
 
       await User.findByIdAndUpdate(
         _id,
-        { avatarURL: public_id },
+        { avatarURL: CLOUDINARY_PHOTO_BASE + public_id },
         { returnDocument: "after" }
       );
 
