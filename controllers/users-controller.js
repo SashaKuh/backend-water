@@ -7,7 +7,7 @@ import fs from "fs/promises";
 import { ctrlWrapper, httpError } from "../decorators/index.js";
 import User from "../models/users.js";
 
-const { JWT_SECRET, CLOUDINARY_PHOTO_BASE } = process.env;
+const { JWT_SECRET } = process.env;
 
 const signup = async (req, res, next) => {
   const { email, password } = req.body;
@@ -27,7 +27,7 @@ const signup = async (req, res, next) => {
     email,
     password: hashedPassword,
     username,
-    avatarURL,
+    avatar: { URL: avatarURL },
   });
 
   const token = jwt.sign({ _id: newUser._id }, JWT_SECRET, {
@@ -43,7 +43,7 @@ const signup = async (req, res, next) => {
   res.status(201).json({
     email: userWithToken.email,
     username: userWithToken.username,
-    avatarURL: userWithToken.avatarURL,
+    avatar: userWithToken.avatar,
     dailyNorma: userWithToken.dailyNorma,
     token: userWithToken.token,
   });
@@ -76,7 +76,7 @@ const signin = async (req, res, next) => {
   res.status(200).json({
     email: userWithToken.email,
     username: userWithToken.username,
-    avatarURL: userWithToken.avatarURL,
+    avatarURL: userWithToken.avatar,
     dailyNorma: userWithToken.dailyNorma,
     token: userWithToken.token,
   });
@@ -101,9 +101,9 @@ const current = async (req, res, next) => {
   if (!result) {
     throw httpError(401, "Not authorized");
   }
-  const { email, username, avatarURL, dailyNorma } = result;
+  const { email, username, avatar, dailyNorma } = result;
 
-  res.status(200).json({ email, username, avatarURL, dailyNorma });
+  res.status(200).json({ email, username, avatar, dailyNorma });
 };
 
 // temp
@@ -125,9 +125,9 @@ const updateUserData = async (req, res, next) => {
     httpError(401, "Not authorized");
   }
 
-  const { email, username, avatarURL, dailyNorma } = result;
+  const { email, username, avatar, dailyNorma } = result;
 
-  res.status(200).json({ email, username, avatarURL, dailyNorma });
+  res.status(200).json({ email, username, avatar, dailyNorma });
 };
 
 const updateAvatar = async (req, res, next) => {
@@ -151,9 +151,9 @@ const updateAvatar = async (req, res, next) => {
         },
       ],
     })
-    .then(async ({ public_id }) => {
-      if (!user.avatarURL.includes("gravatar")) {
-        await cloudinary.api.delete_resources([user.avatarURL], {
+    .then(async ({ public_id, secure_url }) => {
+      if (user.avatar.public_id) {
+        await cloudinary.api.delete_resources([user.avatar.public_id], {
           type: "upload",
           resource_type: "image",
         });
@@ -161,11 +161,11 @@ const updateAvatar = async (req, res, next) => {
 
       await User.findByIdAndUpdate(
         _id,
-        { avatarURL: CLOUDINARY_PHOTO_BASE + public_id },
+        { avatar: { public_id, URL: secure_url } },
         { returnDocument: "after" }
       );
 
-      res.status(200).json({ avatarURL: public_id });
+      res.status(200).json({ public_id, URL: secure_url });
     })
     .catch((e) => {
       throw httpError(408, "Request timeout. Not response from cloudinary.");
