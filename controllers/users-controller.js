@@ -147,7 +147,7 @@ const updateAvatar = async (req, res, next) => {
         {
           height: 100,
           width: 100,
-          crop: "lfill",
+          crop: "lpad",
         },
       ],
     })
