@@ -27,9 +27,15 @@ const usersSchema = new Schema(
       max: 15000,
       min: 0,
     },
-    avatarURL: {
-      type: String,
-      required: [true, "Avatar is required"],
+    avatar: {
+      URL: {
+        type: String,
+        required: [true, "avatar URL is required"],
+      },
+      public_id: {
+        type: String,
+        default: null,
+      },
     },
     token: {
       type: String,
