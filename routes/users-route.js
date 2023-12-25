@@ -3,7 +3,7 @@ import userController from "../controllers/users-controller.js";
 import validateBody from "../decorators/validateBody.js";
 import { authUserSchema, userUpdateSchema } from "../schemas/user-shemas.js";
 import { isEmptyBody } from "../helpers/index.js";
-import { authenticate } from "../middlewars/index.js";
+import { authenticate, upload } from "../middlewars/index.js";
 
 const usersRoute = express.Router();
 
@@ -33,6 +33,11 @@ usersRoute.patch(
   userController.updateUserData
 );
 
-usersRoute.patch("/avatar", authenticate);
+usersRoute.patch(
+  "/avatar",
+  authenticate,
+  upload.single("avatar"),
+  userController.updateAvatar
+);
 
 export default usersRoute;
