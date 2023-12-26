@@ -43,7 +43,7 @@ const signup = async (req, res, next) => {
   res.status(201).json({
     email: userWithToken.email,
     username: userWithToken.username,
-    avatar: userWithToken.avatar,
+    avatar: { URL: userWithToken.avatar.URL },
     dailyNorma: userWithToken.dailyNorma,
     token: userWithToken.token,
   });
@@ -76,7 +76,7 @@ const signin = async (req, res, next) => {
   res.status(200).json({
     email: userWithToken.email,
     username: userWithToken.username,
-    avatarURL: userWithToken.avatar,
+    avatar: { URL: userWithToken.avatar.URL },
     dailyNorma: userWithToken.dailyNorma,
     token: userWithToken.token,
   });
@@ -103,7 +103,9 @@ const current = async (req, res, next) => {
   }
   const { email, username, avatar, dailyNorma } = result;
 
-  res.status(200).json({ email, username, avatar, dailyNorma });
+  res
+    .status(200)
+    .json({ email, username, avatar: { URL: avatar.URL }, dailyNorma });
 };
 
 // temp
@@ -127,7 +129,9 @@ const updateUserData = async (req, res, next) => {
 
   const { email, username, avatar, dailyNorma } = result;
 
-  res.status(200).json({ email, username, avatar, dailyNorma });
+  res
+    .status(200)
+    .json({ email, username, avatar: { URL: avatar.URL }, dailyNorma });
 };
 
 const updateAvatar = async (req, res, next) => {
@@ -165,7 +169,7 @@ const updateAvatar = async (req, res, next) => {
         { returnDocument: "after" }
       );
 
-      res.status(200).json({ public_id, URL: secure_url });
+      res.status(200).json({ avatar: { URL: secure_url } });
     })
     .catch((e) => {
       throw httpError(408, "Request timeout. Not response from cloudinary.");
