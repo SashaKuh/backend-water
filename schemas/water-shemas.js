@@ -31,3 +31,7 @@ export const waterEditSchema = Joi.object({
   waterVolume: Joi.number().min(1).max(1500).messages(errorMessage),
   date: Joi.string().pattern(dateRegExp).messages(errorMessage),
 });
+
+export const waterTodaySchema = Joi.object({
+  date: Joi.string().pattern(dateRegExp).required().messages(errorMessage),
+});

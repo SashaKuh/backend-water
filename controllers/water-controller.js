@@ -41,9 +41,41 @@ const deleteEntry = async (req, res, next) => {
   res.status(204).send();
 };
 
+const getToday = async (req, res, next) => {
+  const { date } = req.body;
+  const { _id: owner } = req.user;
+
+  const { dailyNorma } = await User.findById(owner, "-_id dailyNorma");
+  if (!dailyNorma) {
+    return next(httpError(404, "Not found"));
+  }
+
+  const todayRegex = new RegExp(date.split("T")[0]);
+
+  const entries = await Entry.aggregate([
+    { $match: { date: { $regex: todayRegex }, owner } },
+    { $project: { waterVolume: 1, date: 1 } },
+  ]);
+
+  const todayAmount = entries.reduce((sum, { waterVolume }) => {
+    sum += waterVolume;
+    return sum;
+  }, 0);
+  const completed =
+    (todayAmount / dailyNorma) * 100 > 100
+      ? 100
+      : Math.round((todayAmount / dailyNorma) * 100);
+
+  res.json({
+    entries,
+    completed,
+  });
+};
+
 export default {
   rateDaily: ctrlWrapper(rateDaily),
   addEntry: ctrlWrapper(addEntry),
   editEntry: ctrlWrapper(editEntry),
   deleteEntry: ctrlWrapper(deleteEntry),
+  getToday: ctrlWrapper(getToday),
 };
