@@ -38,4 +38,6 @@ waterRoute.put(
 
 waterRoute.delete("/:entryId", isValidId, waterController.deleteEntry);
 
+waterRoute.get("/today", isEmptyBody, waterController.getToday);
+
 export default waterRoute;
