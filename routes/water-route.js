@@ -6,6 +6,7 @@ import {
   waterEntrySchema,
   waterDailySchema,
   waterEditSchema,
+  waterTodaySchema,
 } from "../schemas/water-shemas.js";
 import { isValidId } from "../helpers/index.js";
 import { authenticate } from "../middlewars/index.js";
@@ -38,6 +39,11 @@ waterRoute.put(
 
 waterRoute.delete("/:entryId", isValidId, waterController.deleteEntry);
 
-waterRoute.get("/today", isEmptyBody, waterController.getToday);
+waterRoute.get(
+  "/today",
+  isEmptyBody,
+  validateBody(waterTodaySchema),
+  waterController.getToday
+);
 
 export default waterRoute;
