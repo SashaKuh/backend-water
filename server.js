@@ -8,9 +8,7 @@ mongoose
   .connect(DB_HOST)
   .then(() =>
     app.listen(PORT, () => {
-      console.log(
-        `App listening on port ${PORT} \nServer URL: ${BASE_URL}:${PORT}`
-      );
+      console.log(`App listening on port ${PORT} \nServer URL: ${BASE_URL}`);
     })
   )
   .catch((e) => {
