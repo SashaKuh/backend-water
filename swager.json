@@ -1,21 +1,20 @@
 {
-  "openapi": "3.1.0",
+  "openapi": "3.0.3",
   "info": {
     "title": "Water Tracker API",
-    "description": "## API documentation for project Water Tracker [link](https://sashakuh.github.io/frontend-water/) \nThis project is a web application for tracking the level of daily water consumption. It allows the user to easily track the amount of water they drank compared to the daily norm. The project is aimed at improving awareness of the importance of proper fluid consumption and helps to form healthy habits among users. \n\nOur app provides for the possibility of user registration, authentication and authorization. Users can save information about the amount of liquid drunk, edit it. View statistics of consumed water from the user's daily norm in percentages for one day and for all days of the selected month. \n\nIn addition, the application has a friendly and clear user interface that allows you to perform all the necessary actions conveniently and quickly. The project also ensures user security through password encryption and token-based identification.",
+    "description": "## API documentation for project Water Tracker [link](https://sashakuh.github.io/frontend-water/) \nThe project is a web application for tracking daily water consumption level. It allows the user to calculate their personal daily water consuption norm and then track how much water they drink compared to this amount. The project aim is to help users  easily track the amount of water consumed and form healthy water consuption habits. \n\nOur app has the following features: user registration, authentication and authorization. Users can insert, save, and change the information about the amount of water drunk and change their daily norm. Users also can view statistics of daily and monthly water consumption. Daily statistics shows the daily norm, amount of consumed water, and the correlation between them in percents. Monthly statistics shows how much water the user consumed in a chosen month. It also shows the days when the user fulfilled the daily norm and when they did not meet the norm. If the daily norm was not fulfilled, the app also shows to what extent in percents the user reached their norm. \n\nIn addition, the application has a friendly user interface that allows you to perform all the necessary actions conveniently and quickly. The project ensures user security through password encryption and token-based identification.",
     "version": "1.0.0"
   },
   "servers": [
     {
-      "url": "http://localhost:3000/",
-      "description": "Local test server"
-    },
-    {
       "url": "https://backend-water.onrender.com/",
       "description": "Main (production) server"
+    },
+    {
+      "url": "http://localhost:3000/",
+      "description": "Local test server"
     }
   ],
-
   "tags": [
     {
       "name": "users",
@@ -26,7 +25,6 @@
       "description": "Напиши тут щось :D"
     }
   ],
-
   "paths": {
     "/users/signup": {
       "post": {
@@ -40,9 +38,24 @@
             "description": "Created",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/userData" }
+                "schema": {
+                  "$ref": "#/components/schemas/userDataAuth"
+                },
+                "example": {
+                  "email": "test@mail.com",
+                  "username": "test",
+                  "gender": "girl",
+                  "avatar": {
+                    "URL": "https://s.gravatar.com/avatar/db16583ea34f55e2250f96a83f00d5b7?s=250&r=g&d=retro"
+                  },
+                  "dailyNorma": 2000,
+                  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
           },
           "409": {
             "description": "Conflict",
@@ -59,9 +72,43 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/users/signin": {
+      "post": {
+        "tags": ["users"],
+        "summary": "Sign in (login) user",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/bodyAuth"
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/userDataAuth"
+                },
+                "example": {
+                  "email": "test@mail.com",
+                  "username": "test",
+                  "gender": "girl",
+                  "avatar": {
+                    "URL": "https://s.gravatar.com/avatar/db16583ea34f55e2250f96a83f00d5b7?s=250&r=g&d=retro"
+                  },
+                  "dailyNorma": 2000,
+                  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                }
+              }
+            }
           },
           "400": {
-            "description": "Bad Request",
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -69,7 +116,157 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Request error description"
+                      "example": "Email or password is wrong"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/signout": {
+      "post": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["users"],
+        "summary": "Signout (logout) user",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          }
+        }
+      }
+    },
+    "/users/current": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["users"],
+        "summary": "Get information about current user",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UserData200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          }
+        }
+      }
+    },
+    "/users/update": {
+      "patch": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["users"],
+        "summary": "Update current user information",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/bodyUpdate"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UserData200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          }
+        }
+      }
+    },
+    "/users/avatar": {
+      "patch": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["users"],
+        "summary": "Update current user avatar",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "avatar": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": ["avatar"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "avatar": {
+                      "type": "object",
+                      "properties": {
+                        "URL": {
+                          "type": "string",
+                          "examples": [
+                            "https://s.gravatar.com/avatar/db16583ea34f55e2250f96a83f00d5b7?s=250&r=g&d=retro"
+                          ],
+                          "default": "https://s.gravatar.com/avatar/..."
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "avatar": {
+                    "URL": "https://s.gravatar.com/avatar/db16583ea34f55e2250f96a83f00d5b7?s=250&r=g&d=retro"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "408": {
+            "description": "Request timeout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Request timeout. Not response from cloudinary."
                     }
                   }
                 }
@@ -80,27 +277,148 @@
       }
     }
   },
-
   "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
     "requestBodies": {
       "bodyAuth": {
         "required": true,
         "content": {
           "application/json": {
-            "schema": { "$ref": "#/components/schemas/schemaAuth" },
+            "schema": {
+              "$ref": "#/components/schemas/schemaAuth"
+            },
             "examples": {
-              "success": { "$ref": "#/components/examples/authData" }
+              "success": {
+                "$ref": "#/components/examples/authData"
+              }
+            }
+          }
+        }
+      },
+      "bodyUpdate": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/schemaUpdate"
+            },
+            "examples": {
+              "success": {
+                "$ref": "#/components/examples/updateData"
+              }
             }
           }
         }
       }
     },
-
     "responses": {
-      "NotFound": {},
-      "Unauthorized": {}
+      "Unauthorized401": {
+        "description": "Unauthorized Access",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Not authorized"
+                }
+              }
+            }
+          }
+        }
+      },
+      "UserData200": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "examples": ["test@mail.com"]
+                },
+                "username": {
+                  "type": "string",
+                  "examples": ["test"]
+                },
+                "gender": {
+                  "type": "string",
+                  "enum": ["girl", "man"],
+                  "default": "girl"
+                },
+                "avatar": {
+                  "type": "object",
+                  "properties": {
+                    "URL": {
+                      "type": "string",
+                      "examples": [
+                        "https://s.gravatar.com/avatar/db16583ea34f55e2250f96a83f00d5b7?s=250&r=g&d=retro"
+                      ],
+                      "default": "https://s.gravatar.com/avatar/..."
+                    }
+                  }
+                },
+                "dailyNorma": {
+                  "type": "number",
+                  "default": 2000,
+                  "maximum": 15000,
+                  "minimum": 0
+                }
+              }
+            },
+            "example": {
+              "email": "test@mail.com",
+              "username": "test",
+              "gender": "girl",
+              "avatar": {
+                "URL": "https://s.gravatar.com/avatar/db16583ea34f55e2250f96a83f00d5b7?s=250&r=g&d=retro"
+              },
+              "dailyNorma": 2000
+            }
+          }
+        }
+      },
+      "BadRequest400": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Request error description"
+                }
+              }
+            }
+          }
+        }
+      }
     },
-
+    "examples": {
+      "authData": {
+        "value": {
+          "email": "test@mail.com",
+          "password": "examplePassword"
+        }
+      },
+      "updateData": {
+        "value": {
+          "email": "newtest@mail.com",
+          "password": "newPassword",
+          "username": "Vasyl",
+          "gender": "man"
+        }
+      }
+    },
     "schemas": {
       "schemaAuth": {
         "type": "object",
@@ -115,54 +433,66 @@
         },
         "required": ["email", "password"]
       },
-      "userData": {
+      "userDataAuth": {
         "type": "object",
         "properties": {
           "email": {
             "type": "string",
-            "example": "test@mail.com"
+            "examples": ["test@mail.com"]
           },
           "username": {
             "type": "string",
-            "example": "test"
+            "examples": ["test"]
+          },
+          "gender": {
+            "type": "string",
+            "enum": ["girl", "man"],
+            "default": "girl"
           },
           "avatar": {
             "type": "object",
             "properties": {
               "URL": {
                 "type": "string",
-                "example": "https://s.gravatar.com/avatar/db16583ea34f55e2250f96a83f00d5b7?s=250&r=g&d=retro"
+                "examples": [
+                  "https://s.gravatar.com/avatar/db16583ea34f55e2250f96a83f00d5b7?s=250&r=g&d=retro"
+                ],
+                "default": "https://s.gravatar.com/avatar/..."
               }
             }
           },
           "dailyNorma": {
             "type": "number",
-            "min": 0,
-            "max": 15000,
-            "default": 2000
+            "default": 2000,
+            "maximum": 15000,
+            "minimum": 0
           },
           "token": {
             "type": "string",
-            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+            "examples": [
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+            ]
           }
         }
-      }
-    },
-
-    "examples": {
-      "authData": {
-        "value": {
-          "email": "test@mail.com",
-          "password": "examplePassword"
+      },
+      "schemaUpdate": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "example@mail.com"
+          },
+          "password": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": ["girl", "man"]
+          }
         }
-      }
-    },
-
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
       }
     }
   }

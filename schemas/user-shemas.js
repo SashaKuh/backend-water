@@ -17,6 +17,11 @@ export const authUserSchema = Joi.object({
 });
 
 export const userUpdateSchema = Joi.object({
+  email: Joi.string().pattern(patternForEmail).messages({
+    "string.pattern.base": "The email must be in the format 'user@email.com'",
+    "any.required": "Email is required field",
+    "string.base": "Email must be a string",
+  }),
   password: Joi.string().min(8).max(64).messages({
     "string.min": "Min length 8 symbols",
     "string.max: ": "Max length 64 symbols",
