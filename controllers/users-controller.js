@@ -43,6 +43,7 @@ const signup = async (req, res, next) => {
   res.status(201).json({
     email: userWithToken.email,
     username: userWithToken.username,
+    gender: userWithToken.gender,
     avatar: { URL: userWithToken.avatar.URL },
     dailyNorma: userWithToken.dailyNorma,
     token: userWithToken.token,
@@ -76,6 +77,7 @@ const signin = async (req, res, next) => {
   res.status(200).json({
     email: userWithToken.email,
     username: userWithToken.username,
+    gender: userWithToken.gender,
     avatar: { URL: userWithToken.avatar.URL },
     dailyNorma: userWithToken.dailyNorma,
     token: userWithToken.token,
@@ -101,11 +103,11 @@ const current = async (req, res, next) => {
   if (!result) {
     throw httpError(401, "Not authorized");
   }
-  const { email, username, avatar, dailyNorma } = result;
+  const { email, username, gender, avatar, dailyNorma } = result;
 
   res
     .status(200)
-    .json({ email, username, avatar: { URL: avatar.URL }, dailyNorma });
+    .json({ email, username, gender, avatar: { URL: avatar.URL }, dailyNorma });
 };
 
 // temp
@@ -127,11 +129,11 @@ const updateUserData = async (req, res, next) => {
     httpError(401, "Not authorized");
   }
 
-  const { email, username, avatar, dailyNorma } = result;
+  const { email, username, gender, avatar, dailyNorma } = result;
 
   res
     .status(200)
-    .json({ email, username, avatar: { URL: avatar.URL }, dailyNorma });
+    .json({ email, username, gender, avatar: { URL: avatar.URL }, dailyNorma });
 };
 
 const updateAvatar = async (req, res, next) => {
