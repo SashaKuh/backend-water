@@ -64,7 +64,7 @@ const getToday = async (req, res, next) => {
   const completed =
     (todayAmount / dailyNorma) * 100 > 100
       ? 100
-      : (todayAmount / dailyNorma) * 100;
+      : Math.round((todayAmount / dailyNorma) * 100);
 
   res.json({
     entries,
