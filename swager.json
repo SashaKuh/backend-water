@@ -178,7 +178,7 @@
           }
         ],
         "tags": ["users"],
-        "summary": "Update user information",
+        "summary": "Update current user information",
         "requestBody": {
           "$ref": "#/components/requestBodies/bodyUpdate"
         },
@@ -190,20 +190,7 @@
             "$ref": "#/components/responses/BadRequest400"
           },
           "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Email or password is wrong"
-                    }
-                  }
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthorized401"
           }
         }
       }
@@ -216,19 +203,62 @@
           }
         ],
         "tags": ["users"],
-        "summary": "Sign in (login) user",
+        "summary": "Update current user avatar",
         "requestBody": {
-          "$ref": "#/components/requestBodies/bodyAuth"
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "avatar": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": ["avatar"]
+              }
+            }
+          }
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/UserData200"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "avatar": {
+                      "type": "object",
+                      "properties": {
+                        "URL": {
+                          "type": "string",
+                          "examples": [
+                            "https://s.gravatar.com/avatar/db16583ea34f55e2250f96a83f00d5b7?s=250&r=g&d=retro"
+                          ],
+                          "default": "https://s.gravatar.com/avatar/..."
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "avatar": {
+                    "URL": "https://s.gravatar.com/avatar/db16583ea34f55e2250f96a83f00d5b7?s=250&r=g&d=retro"
+                  }
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
           },
           "401": {
-            "description": "Unauthorized",
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "408": {
+            "description": "Request timeout",
             "content": {
               "application/json": {
                 "schema": {
@@ -236,7 +266,7 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Email or password is wrong"
+                      "example": "Request timeout. Not response from cloudinary."
                     }
                   }
                 }
