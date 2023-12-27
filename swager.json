@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Water Tracker API",
-    "description": "## API documentation for project Water Tracker [link](https://sashakuh.github.io/frontend-water/) \nThis project is a web application for tracking the level of daily water consumption. It allows the user to easily track the amount of water they drank compared to the daily norm. The project is aimed at improving awareness of the importance of proper fluid consumption and helps to form healthy habits among users. \n\nOur app provides for the possibility of user registration, authentication and authorization. Users can save information about the amount of liquid drunk, edit it. View statistics of consumed water from the user's daily norm in percentages for one day and for all days of the selected month. \n\nIn addition, the application has a friendly and clear user interface that allows you to perform all the necessary actions conveniently and quickly. The project also ensures user security through password encryption and token-based identification.",
+    "description": "## API documentation for project Water Tracker [link](https://sashakuh.github.io/frontend-water/) \nThe project is a web application for tracking daily water consumption level. It allows the user to calculate their personal daily water consuption norm and then track how much water they drink compared to this amount. The project aim is to help users  easily track the amount of water consumed and form healthy water consuption habits. \n\nOur app has the following features: user registration, authentication and authorization. Users can insert, save, and change the information about the amount of water drunk and change their daily norm. Users also can view statistics of daily and monthly water consumption. Daily statistics shows the daily norm, amount of consumed water, and the correlation between them in percents. Monthly statistics shows how much water the user consumed in a chosen month. It also shows the days when the user fulfilled the daily norm and when they did not meet the norm. If the daily norm was not fulfilled, the app also shows to what extent in percents the user reached their norm. \n\nIn addition, the application has a friendly user interface that allows you to perform all the necessary actions conveniently and quickly. The project ensures user security through password encryption and token-based identification.",
     "version": "1.0.0"
   },
   "servers": [
@@ -54,6 +54,58 @@
                     "message": {
                       "type": "string",
                       "example": "User with this email already exists"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Request error description"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/users/signin": {
+      "post": {
+        "tags": ["users"],
+        "summary": "Sign in (login) user",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/bodyAuth"
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/userData" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Email or password is wrong"
                     }
                   }
                 }
