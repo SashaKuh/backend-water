@@ -26,7 +26,7 @@ usersRoute.post("/signout", authenticate, userController.signout);
 usersRoute.get("/current", authenticate, userController.current);
 
 usersRoute.patch(
-  "/",
+  "/update",
   authenticate,
   isEmptyBody,
   validateBody(userUpdateSchema),

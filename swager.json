@@ -39,7 +39,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/userData"
+                  "$ref": "#/components/schemas/userDataAuth"
                 },
                 "example": {
                   "email": "test@mail.com",
@@ -55,20 +55,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Request error description"
-                    }
-                  }
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest400"
           },
           "409": {
             "description": "Conflict",
@@ -102,7 +89,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/userData"
+                  "$ref": "#/components/schemas/userDataAuth"
                 },
                 "example": {
                   "email": "test@mail.com",
@@ -118,20 +105,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Request error description"
-                    }
-                  }
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest400"
           },
           "401": {
             "description": "Unauthorized",
@@ -166,7 +140,57 @@
             "description": "No Content"
           },
           "400": {
-            "description": "Bad Request",
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          }
+        }
+      }
+    },
+    "/users/current": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["users"],
+        "summary": "Get information about current user",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UserData200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          }
+        }
+      }
+    },
+    "/users/update": {
+      "patch": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["users"],
+        "summary": "Update user information",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/bodyUpdate"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UserData200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -174,12 +198,34 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Request error description"
+                      "example": "Email or password is wrong"
                     }
                   }
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/users/avatar": {
+      "patch": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["users"],
+        "summary": "Sign in (login) user",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/bodyAuth"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UserData200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
           },
           "401": {
             "description": "Unauthorized",
@@ -224,25 +270,25 @@
             }
           }
         }
-      }
-    },
-    "responses": {
-      "NotFound": {
-        "description": "Resource Not Found",
+      },
+      "bodyUpdate": {
+        "required": true,
         "content": {
           "application/json": {
             "schema": {
-              "type": "object",
-              "properties": {
-                "message": {
-                  "type": "string"
-                }
+              "$ref": "#/components/schemas/schemaUpdate"
+            },
+            "examples": {
+              "success": {
+                "$ref": "#/components/examples/updateData"
               }
             }
           }
         }
-      },
-      "Unauthorized": {
+      }
+    },
+    "responses": {
+      "Unauthorized401": {
         "description": "Unauthorized Access",
         "content": {
           "application/json": {
@@ -250,7 +296,76 @@
               "type": "object",
               "properties": {
                 "message": {
-                  "type": "string"
+                  "type": "string",
+                  "example": "Not authorized"
+                }
+              }
+            }
+          }
+        }
+      },
+      "UserData200": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "examples": ["test@mail.com"]
+                },
+                "username": {
+                  "type": "string",
+                  "examples": ["test"]
+                },
+                "gender": {
+                  "type": "string",
+                  "enum": ["girl", "man"],
+                  "default": "girl"
+                },
+                "avatar": {
+                  "type": "object",
+                  "properties": {
+                    "URL": {
+                      "type": "string",
+                      "examples": [
+                        "https://s.gravatar.com/avatar/db16583ea34f55e2250f96a83f00d5b7?s=250&r=g&d=retro"
+                      ],
+                      "default": "https://s.gravatar.com/avatar/..."
+                    }
+                  }
+                },
+                "dailyNorma": {
+                  "type": "number",
+                  "default": 2000,
+                  "maximum": 15000,
+                  "minimum": 0
+                }
+              }
+            },
+            "example": {
+              "email": "test@mail.com",
+              "username": "test",
+              "gender": "girl",
+              "avatar": {
+                "URL": "https://s.gravatar.com/avatar/db16583ea34f55e2250f96a83f00d5b7?s=250&r=g&d=retro"
+              },
+              "dailyNorma": 2000
+            }
+          }
+        }
+      },
+      "BadRequest400": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Request error description"
                 }
               }
             }
@@ -263,6 +378,14 @@
         "value": {
           "email": "test@mail.com",
           "password": "examplePassword"
+        }
+      },
+      "updateData": {
+        "value": {
+          "email": "newtest@mail.com",
+          "password": "newPassword",
+          "username": "Vasyl",
+          "gender": "man"
         }
       }
     },
@@ -280,7 +403,7 @@
         },
         "required": ["email", "password"]
       },
-      "userData": {
+      "userDataAuth": {
         "type": "object",
         "properties": {
           "email": {
@@ -319,6 +442,25 @@
             "examples": [
               "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
             ]
+          }
+        }
+      },
+      "schemaUpdate": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "example@mail.com"
+          },
+          "password": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": ["girl", "man"]
           }
         }
       }
