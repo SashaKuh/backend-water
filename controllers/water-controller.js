@@ -72,19 +72,40 @@ const getToday = async (req, res, next) => {
   });
 };
 
-const getMonth = async (req, res, next) => {
-  const { date } = req.body;
-  const { _id: owner } = req.user;
+// const getMonth = async (req, res, next) => {
+//   const { date } = req.body;
+//   const { _id: owner } = req.user;
 
-  const monthRegex = new RegExp(date.split("T")[0].substring(0, 7));
+//   const monthRegex = new RegExp(date.split("T")[0].substring(0, 7));
 
-  const monthEntries = await Entry.aggregate([
-    { $match: { date: { $regex: monthRegex }, owner } },
-    { $project: { waterVolume: 1, date: 1 } },
-  ]);
+//   const monthEntries = await Entry.aggregate([
+//     { $match: { date: { $regex: monthRegex }, owner } },
+//     { $project: { waterVolume: 1, date: 1 } },
+//     {
+//       $bucket: {
+//         groupBy: {
+//           $dayOfMonth: {
+//             $dateFromString: {
+//               dateString: "$date",
+//             },
+//           },
+//         },
+//         boundaries: [0, 31],
+//         output: {
+//           count: { $sum: 1 },
+//           entries: {
+//             $push: {
+//               waterVolume: "$waterVolume",
+//               date: "$date",
+//             },
+//           },
+//         },
+//       },
+//     },
+//   ]);
 
-  res.json(monthEntries);
-};
+//   res.json(monthEntries);
+// };
 
 export default {
   rateDaily: ctrlWrapper(rateDaily),
@@ -92,5 +113,5 @@ export default {
   editEntry: ctrlWrapper(editEntry),
   deleteEntry: ctrlWrapper(deleteEntry),
   getToday: ctrlWrapper(getToday),
-  getMonth: ctrlWrapper(getMonth),
+  // getMonth: ctrlWrapper(getMonth),
 };
