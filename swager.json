@@ -7,15 +7,19 @@
   },
   "servers": [
     {
-      "url": "https://backend-water.onrender.com/",
+      "url": "https://backend-water.onrender.com/api/",
       "description": "Main (production) server"
     },
     {
-      "url": "http://localhost:3000/",
+      "url": "http://localhost:3000/api/",
       "description": "Local test server"
     }
   ],
   "tags": [
+    {
+      "name": "auth",
+      "description": "Managing the authentication and authorization process for users within the system"
+    },
     {
       "name": "users",
       "description": "Operations related to user management"
@@ -26,9 +30,9 @@
     }
   ],
   "paths": {
-    "/users/signup": {
+    "/auth/signup": {
       "post": {
-        "tags": ["users"],
+        "tags": ["auth"],
         "summary": "Sign up (registration) new user",
         "requestBody": {
           "$ref": "#/components/requestBodies/bodyAuth"
@@ -76,9 +80,9 @@
         }
       }
     },
-    "/users/signin": {
+    "/auth/signin": {
       "post": {
-        "tags": ["users"],
+        "tags": ["auth"],
         "summary": "Sign in (login) user",
         "requestBody": {
           "$ref": "#/components/requestBodies/bodyAuth"
@@ -126,14 +130,14 @@
         }
       }
     },
-    "/users/signout": {
+    "/auth/signout": {
       "post": {
         "security": [
           {
             "bearerAuth": []
           }
         ],
-        "tags": ["users"],
+        "tags": ["auth"],
         "summary": "Signout (logout) user",
         "responses": {
           "204": {
