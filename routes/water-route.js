@@ -46,4 +46,6 @@ waterRoute.get(
   waterController.getToday
 );
 
+waterRoute.get("/month", waterController.getMonth);
+
 export default waterRoute;

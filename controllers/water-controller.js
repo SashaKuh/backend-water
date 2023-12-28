@@ -72,10 +72,25 @@ const getToday = async (req, res, next) => {
   });
 };
 
+const getMonth = async (req, res, next) => {
+  const { date } = req.body;
+  const { _id: owner } = req.user;
+
+  const monthRegex = new RegExp(date.split("T")[0].substring(0, 7));
+
+  const monthEntries = await Entry.aggregate([
+    { $match: { date: { $regex: monthRegex }, owner } },
+    { $project: { waterVolume: 1, date: 1 } },
+  ]);
+
+  res.json(monthEntries);
+};
+
 export default {
   rateDaily: ctrlWrapper(rateDaily),
   addEntry: ctrlWrapper(addEntry),
   editEntry: ctrlWrapper(editEntry),
   deleteEntry: ctrlWrapper(deleteEntry),
   getToday: ctrlWrapper(getToday),
+  getMonth: ctrlWrapper(getMonth),
 };
