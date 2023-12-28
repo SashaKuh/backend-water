@@ -19,13 +19,23 @@ const current = async (req, res, next) => {
     .json({ email, username, gender, avatar: { URL: avatar.URL }, dailyNorma });
 };
 
-// temp
 const updateUserData = async (req, res, next) => {
   const { body } = req;
   const { _id } = req.user;
 
-  if (body.password) {
-    body.password = await bcrypt.hash(body.password, 10);
+  const user = await User.findById(_id);
+
+  if (body.password?.oldPassword && body.password?.newPassword) {
+    const match = await bcrypt.compare(
+      body.password.oldPassword,
+      user.password
+    );
+
+    if (!match) {
+      throw httpError(400, "Field oldPassword is wrong value");
+    }
+
+    body.password = await bcrypt.hash(body.password.newPassword, 10);
   }
 
   const result = await User.findByIdAndUpdate(
@@ -40,9 +50,13 @@ const updateUserData = async (req, res, next) => {
 
   const { email, username, gender, avatar, dailyNorma } = result;
 
-  res
-    .status(200)
-    .json({ email, username, gender, avatar: { URL: avatar.URL }, dailyNorma });
+  res.status(200).json({
+    email,
+    username,
+    gender,
+    avatar: { URL: avatar.URL },
+    dailyNorma,
+  });
 };
 
 const updateAvatar = async (req, res, next) => {
