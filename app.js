@@ -19,7 +19,7 @@ app.use("/docs", swager.serve, swager.setup(JSON.parse(swagerDocument)));
 
 app.use("/api/auth", authRoute);
 app.use("/api/users", usersRoute);
-app.use("/water", waterRoute);
+app.use("/api/water", waterRoute);
 
 app.use((req, res, next) => {
   res.status(404).json({ message: "Not found" });
