@@ -3,7 +3,7 @@
   "info": {
     "title": "Water Tracker API",
     "description": "## API documentation for project Water Tracker [link](https://sashakuh.github.io/frontend-water/) \nThe project is a web application for tracking daily water consumption level. It allows the user to calculate their personal daily water consuption norm and then track how much water they drink compared to this amount. The project aim is to help users  easily track the amount of water consumed and form healthy water consuption habits. \n\nOur app has the following features: user registration, authentication and authorization. Users can insert, save, and change the information about the amount of water drunk and change their daily norm. Users also can view statistics of daily and monthly water consumption. Daily statistics shows the daily norm, amount of consumed water, and the correlation between them in percents. Monthly statistics shows how much water the user consumed in a chosen month. It also shows the days when the user fulfilled the daily norm and when they did not meet the norm. If the daily norm was not fulfilled, the app also shows to what extent in percents the user reached their norm. \n\nIn addition, the application has a friendly user interface that allows you to perform all the necessary actions conveniently and quickly. The project ensures user security through password encryption and token-based identification.",
-    "version": "1.0.0"
+    "version": "1.0.1"
   },
   "servers": [
     {
@@ -310,7 +310,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/schemaUpdate"
+              "$ref": "#/components/schemas/schemaUserUpdate"
             },
             "examples": {
               "success": {
@@ -417,7 +417,10 @@
       "updateData": {
         "value": {
           "email": "newtest@mail.com",
-          "password": "newPassword",
+          "password": {
+            "oldPassword": "examplePassword",
+            "newPassword": "newPassword"
+          },
           "username": "Vasyl",
           "gender": "man"
         }
@@ -479,7 +482,7 @@
           }
         }
       },
-      "schemaUpdate": {
+      "schemaUserUpdate": {
         "type": "object",
         "properties": {
           "email": {
@@ -487,7 +490,18 @@
             "format": "example@mail.com"
           },
           "password": {
-            "type": "string"
+            "type": "object",
+            "required": false,
+            "properties": {
+              "oldPassword": {
+                "type": "string",
+                "required": true
+              },
+              "newPassword": {
+                "type": "string",
+                "required": true
+              }
+            }
           },
           "username": {
             "type": "string"
