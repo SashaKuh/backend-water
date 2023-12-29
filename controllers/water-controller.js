@@ -55,11 +55,6 @@ const getToday = async (req, res, next) => {
   const { date } = req.body;
   const { _id: owner } = req.user;
 
-  const { dailyNorma } = await User.findById(owner, "-_id dailyNorma");
-  if (!dailyNorma) {
-    return next(httpError(404, "Not found"));
-  }
-
   const todayRegex = new RegExp(date.split("T")[0]);
 
   const entries = await Entry.aggregate([
@@ -87,7 +82,7 @@ const getToday = async (req, res, next) => {
     },
   ]);
 
-  res.json(...entries);
+  res.json(entries);
 };
 
 const getMonth = async (req, res, next) => {
@@ -96,6 +91,7 @@ const getMonth = async (req, res, next) => {
 
   const yearAndMonth = date.split("T")[0].substring(0, 7).split("-");
   const amountOfDays = generateDays(yearAndMonth[0], yearAndMonth[1]);
+
   const monthRegex = new RegExp(yearAndMonth.join("-"));
 
   const monthEntries = await Entry.aggregate([
@@ -140,7 +136,16 @@ const getMonth = async (req, res, next) => {
         },
       },
     },
-    { $fill: { output: { servings: { value: 0 } } } },
+    {
+      $fill: {
+        output: {
+          date: { value: null },
+          servings: { value: null },
+          dailyNorma: { value: null },
+          completed: { value: null },
+        },
+      },
+    },
   ]);
 
   res.json(monthEntries);

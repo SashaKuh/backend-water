@@ -1,13 +1,14 @@
 import Joi from "joi";
 
+const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
+
 const errorMessage = (field) => {
   return {
     "number.base": `${field} must be a number`,
     "number.min": "Minimal value is 1",
     "number.max": "Maximal value is 1500",
     "any.required": `${field} is required field`,
-    "date.base": "Date must be in right format",
-    "date.format": "The date must match ISO format",
+    "string.pattern.base": "Date must match ISO format",
   };
 };
 
@@ -29,7 +30,10 @@ export const waterEntrySchema = Joi.object({
     .max(1500)
     .required()
     .messages(errorMessage("waterVolume")),
-  date: Joi.date().iso().required().messages(errorMessage("date")),
+  date: Joi.string()
+    .pattern(dateRegex)
+    .required()
+    .messages(errorMessage("date")),
 });
 
 export const waterEditSchema = Joi.object({
@@ -38,9 +42,15 @@ export const waterEditSchema = Joi.object({
     .max(1500)
     .required()
     .messages(errorMessage("waterVolume")),
-  date: Joi.date().iso().required().messages(errorMessage("date")),
+  date: Joi.string()
+    .pattern(dateRegex)
+    .required()
+    .messages(errorMessage("date")),
 });
 
-export const waterMonthSchema = Joi.object({
-  date: Joi.date().iso().required().messages(errorMessage("date")),
+export const waterDateSchema = Joi.object({
+  date: Joi.string()
+    .pattern(dateRegex)
+    .required()
+    .messages(errorMessage("date")),
 });
