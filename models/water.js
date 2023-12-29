@@ -1,8 +1,6 @@
 import { Schema, model } from "mongoose";
 import { handleSaveError, enableUpdateOptions } from "./hooks.js";
 
-const dateRegExp = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
-
 const entrySchema = new Schema(
   {
     waterVolume: {
@@ -12,11 +10,7 @@ const entrySchema = new Schema(
       required: [true, "value is required."],
     },
     date: {
-      type: String,
-      match: [
-        dateRegExp,
-        "value does not match the allowed format (YYYY-MM-DDTHH:MM:SS)",
-      ],
+      type: Date,
       required: [true, "value is required."],
     },
     dailyNorma: {
@@ -30,7 +24,7 @@ const entrySchema = new Schema(
       ref: "user",
     },
   },
-  { versionKey: false, timestamps: true }
+  { versionKey: false }
 );
 
 entrySchema.post("save", handleSaveError);

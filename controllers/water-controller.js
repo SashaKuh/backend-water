@@ -34,6 +34,7 @@ const editEntry = async (req, res, next) => {
     { _id: entryId, owner },
     req.body
   );
+
   if (!result) {
     return next(httpError(404, "Not found"));
   }
@@ -63,22 +64,30 @@ const getToday = async (req, res, next) => {
 
   const entries = await Entry.aggregate([
     { $match: { date: { $regex: todayRegex }, owner } },
-    { $project: { waterVolume: 1, date: 1 } },
+    {
+      $group: {
+        _id: null,
+        entries: {
+          $push: { _id: "$_id", waterVolume: "$waterVolume", date: "$date" },
+        },
+        total: { $sum: "$waterVolume" },
+        dailyNorma: { $last: "$dailyNorma" },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        entries: 1,
+        completed: {
+          $round: [
+            { $multiply: [{ $divide: ["$total", "$dailyNorma"] }, 100] },
+          ],
+        },
+      },
+    },
   ]);
 
-  const todayAmount = entries.reduce((sum, { waterVolume }) => {
-    sum += waterVolume;
-    return sum;
-  }, 0);
-  const completed =
-    (todayAmount / dailyNorma) * 100 > 100
-      ? 100
-      : Math.round((todayAmount / dailyNorma) * 100);
-
-  res.json({
-    entries,
-    completed,
-  });
+  res.json(...entries);
 };
 
 const getMonth = async (req, res, next) => {
@@ -106,6 +115,19 @@ const getMonth = async (req, res, next) => {
           servings: { $sum: 1 },
           date: { $last: "$date" },
           dailyNorma: { $last: "$dailyNorma" },
+          total: { $sum: "$waterVolume" },
+        },
+      },
+    },
+    {
+      $project: {
+        date: 1,
+        servings: 1,
+        dailyNorma: 1,
+        completed: {
+          $round: [
+            { $multiply: [{ $divide: ["$total", "$dailyNorma"] }, 100] },
+          ],
         },
       },
     },
