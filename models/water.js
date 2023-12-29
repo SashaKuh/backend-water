@@ -19,6 +19,12 @@ const entrySchema = new Schema(
       ],
       required: [true, "value is required."],
     },
+    dailyNorma: {
+      type: Number,
+      default: 2000,
+      max: 15000,
+      min: 0,
+    },
     owner: {
       type: Schema.Types.ObjectId,
       ref: "user",

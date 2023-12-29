@@ -1,11 +1,16 @@
 import { ctrlWrapper, httpError } from "../decorators/index.js";
+import { generateDays } from "../helpers/index.js";
 import User from "../models/users.js";
 import Entry from "../models/water.js";
 
 const rateDaily = async (req, res, next) => {
   const { dailyNorma } = req.body;
   const { _id } = req.user;
-  const result = await User.findByIdAndUpdate(_id, { dailyNorma });
+  const result = await User.findByIdAndUpdate(
+    _id,
+    { dailyNorma },
+    { returnDocument: "after" }
+  );
   if (!result) {
     return next(httpError(404, "Not found"));
   }
@@ -14,7 +19,11 @@ const rateDaily = async (req, res, next) => {
 
 const addEntry = async (req, res) => {
   const { _id: owner } = req.user;
-  await Entry.create({ ...req.body, owner });
+  const { dailyNorma } = await User.findById(owner, "-_id dailyNorma");
+  if (!dailyNorma) {
+    return next(httpError(404, "Not found"));
+  }
+  await Entry.create({ ...req.body, dailyNorma, owner });
   res.status(201).send();
 };
 
@@ -72,40 +81,48 @@ const getToday = async (req, res, next) => {
   });
 };
 
-// const getMonth = async (req, res, next) => {
-//   const { date } = req.body;
-//   const { _id: owner } = req.user;
+const getMonth = async (req, res, next) => {
+  const { date } = req.body;
+  const { _id: owner } = req.user;
 
-//   const monthRegex = new RegExp(date.split("T")[0].substring(0, 7));
+  const yearAndMonth = date.split("T")[0].substring(0, 7).split("-");
+  const amountOfDays = generateDays(yearAndMonth[0], yearAndMonth[1]);
+  const monthRegex = new RegExp(yearAndMonth.join("-"));
 
-//   const monthEntries = await Entry.aggregate([
-//     { $match: { date: { $regex: monthRegex }, owner } },
-//     { $project: { waterVolume: 1, date: 1 } },
-//     {
-//       $bucket: {
-//         groupBy: {
-//           $dayOfMonth: {
-//             $dateFromString: {
-//               dateString: "$date",
-//             },
-//           },
-//         },
-//         boundaries: [0, 31],
-//         output: {
-//           count: { $sum: 1 },
-//           entries: {
-//             $push: {
-//               waterVolume: "$waterVolume",
-//               date: "$date",
-//             },
-//           },
-//         },
-//       },
-//     },
-//   ]);
+  const monthEntries = await Entry.aggregate([
+    { $match: { date: { $regex: monthRegex }, owner } },
+    { $project: { waterVolume: 1, date: 1, dailyNorma: 1 } },
+    {
+      $bucket: {
+        groupBy: {
+          $dayOfMonth: {
+            $dateFromString: {
+              dateString: "$date",
+            },
+          },
+        },
+        boundaries: amountOfDays,
+        output: {
+          servings: { $sum: 1 },
+          date: { $last: "$date" },
+          dailyNorma: { $last: "$dailyNorma" },
+        },
+      },
+    },
+    {
+      $densify: {
+        field: "_id",
+        range: {
+          step: 1,
+          bounds: [1, amountOfDays.length],
+        },
+      },
+    },
+    { $fill: { output: { servings: { value: 0 } } } },
+  ]);
 
-//   res.json(monthEntries);
-// };
+  res.json(monthEntries);
+};
 
 export default {
   rateDaily: ctrlWrapper(rateDaily),
@@ -113,5 +130,5 @@ export default {
   editEntry: ctrlWrapper(editEntry),
   deleteEntry: ctrlWrapper(deleteEntry),
   getToday: ctrlWrapper(getToday),
-  // getMonth: ctrlWrapper(getMonth),
+  getMonth: ctrlWrapper(getMonth),
 };
