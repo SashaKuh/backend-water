@@ -145,10 +145,7 @@ const getMonth = async (req, res, next) => {
     {
       $fill: {
         output: {
-          date: { value: null },
-          servings: { value: null },
-          dailyNorma: { value: null },
-          completed: { value: null },
+          servings: { value: 0 },
         },
       },
     },
