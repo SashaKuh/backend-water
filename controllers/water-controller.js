@@ -1,5 +1,5 @@
 import { ctrlWrapper, httpError } from "../decorators/index.js";
-import { generateDays } from "../helpers/index.js";
+import { generateDays, formatMonth } from "../helpers/index.js";
 import User from "../models/users.js";
 import Entry from "../models/water.js";
 
@@ -89,10 +89,10 @@ const getMonth = async (req, res, next) => {
   const { date } = req.body;
   const { _id: owner } = req.user;
 
-  const yearAndMonth = date.split("T")[0].substring(0, 7).split("-");
-  const amountOfDays = generateDays(yearAndMonth[0], yearAndMonth[1]);
+  const dateSplitted = date.split("T")[0].substring(0, 7).split("-");
+  const amountOfDays = generateDays(dateSplitted[0], dateSplitted[1]);
 
-  const monthRegex = new RegExp(yearAndMonth.join("-"));
+  const monthRegex = new RegExp(dateSplitted.join("-"));
 
   const monthEntries = await Entry.aggregate([
     { $match: { date: { $regex: monthRegex }, owner } },
@@ -117,9 +117,15 @@ const getMonth = async (req, res, next) => {
     },
     {
       $project: {
-        date: 1,
+        date: {
+          $concat: [
+            formatMonth(dateSplitted[1] - 1),
+            ",",
+            { $toString: { $dayOfMonth: { $toDate: "$date" } } },
+          ],
+        },
         servings: 1,
-        dailyNorma: 1,
+        dailyNorma: { $divide: ["$dailyNorma", 1000] },
         completed: {
           $round: [
             { $multiply: [{ $divide: ["$total", "$dailyNorma"] }, 100] },
@@ -139,10 +145,7 @@ const getMonth = async (req, res, next) => {
     {
       $fill: {
         output: {
-          date: { value: null },
-          servings: { value: null },
-          dailyNorma: { value: null },
-          completed: { value: null },
+          servings: { value: 0 },
         },
       },
     },
