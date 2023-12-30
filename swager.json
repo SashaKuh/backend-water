@@ -417,7 +417,10 @@
       "updateData": {
         "value": {
           "email": "newtest@mail.com",
-          "password": "newPassword",
+          "password": {
+            "oldPassword": "examplePassword",
+            "newPassword": "newPassword"
+          },
           "username": "Vasyl",
           "gender": "man"
         }
@@ -487,7 +490,18 @@
             "format": "example@mail.com"
           },
           "password": {
-            "type": "string"
+            "type": "object",
+            "required": false,
+            "properties": {
+              "oldPassword": {
+                "type": "string",
+                "required": true
+              },
+              "newPassword": {
+                "type": "string",
+                "required": true
+              }
+            }
           },
           "username": {
             "type": "string"

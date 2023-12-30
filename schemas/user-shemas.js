@@ -45,3 +45,11 @@ export const userUpdateSchema = Joi.object({
     "string.base": "Gender must be a string",
   }),
 });
+
+export const authForgotPasswordSchema = Joi.object({
+  email: Joi.string().required().pattern(patternForEmail).messages({
+    "string.pattern.base": "The email must be in the format 'user@email.com'",
+    "any.required": "Email is required field",
+    "string.base": "Email must be a string",
+  }),
+});

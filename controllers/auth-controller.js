@@ -94,8 +94,13 @@ const signout = async (req, res, next) => {
   res.status(204).send();
 };
 
+const forgotPassword = (req, res, next) => {
+  const { email } = req.body;
+};
+
 export default {
   signup: ctrlWrapper(signup),
   signin: ctrlWrapper(signin),
   signout: ctrlWrapper(signout),
+  forgotPassword: ctrlWrapper(forgotPassword),
 };
