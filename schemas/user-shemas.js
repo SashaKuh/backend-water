@@ -24,13 +24,13 @@ export const userUpdateSchema = Joi.object({
   }),
   password: Joi.object({
     oldPassword: Joi.string().min(8).max(64).required().messages({
-      "string.base": "Username must be a string",
+      "string.base": "oldPassword must be a string",
       "string.min: ": "Min length 8 symbols",
       "string.max: ": "Max length 64 symbols",
       "any.required": "oldPassword is required field",
     }),
     newPassword: Joi.string().min(8).max(64).required().messages({
-      "string.base": "Username must be a string",
+      "string.base": "newPassword must be a string",
       "string.min: ": "Min length 8 symbols",
       "string.max: ": "Max length 64 symbols",
       "any.required": "newPassword is required field",
