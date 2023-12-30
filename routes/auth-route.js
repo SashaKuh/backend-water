@@ -23,6 +23,6 @@ authRoute.post(
 
 authRoute.post("/signout", authenticate, authController.signout);
 
-authRoute.put("/password", isEmptyBody, validateBody(authUserSchema), authController.forgotPassword);
+// authRoute.put("/password", isEmptyBody, validateBody(authUserSchema), authController.forgotPassword);
 
 export default authRoute;
