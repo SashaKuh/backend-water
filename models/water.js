@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
 import { handleSaveError, enableUpdateOptions } from "./hooks.js";
 
-const dateRegExp = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
+const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
 
 const entrySchema = new Schema(
   {
@@ -13,18 +13,21 @@ const entrySchema = new Schema(
     },
     date: {
       type: String,
-      match: [
-        dateRegExp,
-        "value does not match the allowed format (YYYY-MM-DDTHH:MM:SS)",
-      ],
+      match: dateRegex,
       required: [true, "value is required."],
+    },
+    dailyNorma: {
+      type: Number,
+      default: 2000,
+      max: 15000,
+      min: 0,
     },
     owner: {
       type: Schema.Types.ObjectId,
       ref: "user",
     },
   },
-  { versionKey: false, timestamps: true }
+  { versionKey: false }
 );
 
 entrySchema.post("save", handleSaveError);
