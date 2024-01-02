@@ -3,6 +3,7 @@ import authController from "../controllers/auth-controller.js";
 import validateBody from "../decorators/validateBody.js";
 import {
   authForgotPasswordSchema,
+  authResetPasswordSchema,
   authUserSchema,
 } from "../schemas/user-shemas.js";
 import { isEmptyBody } from "../helpers/index.js";
@@ -27,10 +28,17 @@ authRoute.post(
 authRoute.post("/signout", authenticate, authController.signout);
 
 authRoute.post(
-  "/reset-password",
+  "/request-reset-password",
   isEmptyBody,
   validateBody(authForgotPasswordSchema),
-  authController.forgotPassword
+  authController.requestForgotPassword
+);
+
+authRoute.patch(
+  "/reset-password",
+  isEmptyBody,
+  validateBody(authResetPasswordSchema),
+  authController.resetPassword
 );
 
 export default authRoute;

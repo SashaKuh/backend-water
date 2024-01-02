@@ -7,7 +7,6 @@ import User from "../models/users.js";
 import Token from "../models/token.js";
 import { sendMail } from "../helpers/index.js";
 import { resetPasswordLatter } from "../helpers/mailLatters.js";
-import crypto from "crypto";
 
 const { JWT_SECRET, FRONTEND_URL } = process.env;
 
@@ -98,7 +97,7 @@ const signout = async (req, res, next) => {
   res.status(204).send();
 };
 
-const forgotPassword = async (req, res, next) => {
+const requestForgotPassword = async (req, res, next) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
   if (!user) {
@@ -110,15 +109,16 @@ const forgotPassword = async (req, res, next) => {
     await Token.findOneAndDelete({ userId: user._id });
   }
 
-  const resetToken = crypto.randomBytes(32).toString("hex");
-  const hashedToken = await bcrypt.hash(resetToken, 10);
+  const resetToken = jwt.sign({ _id: user._id }, JWT_SECRET, {
+    expiresIn: "15m",
+  });
 
   await Token.create({
     userId: user._id,
-    token: hashedToken,
+    token: resetToken,
   });
 
-  const link = `${FRONTEND_URL}password-reset?token=${resetToken}&id=${user._id}`;
+  const link = `${FRONTEND_URL}password-reset?token=${resetToken}`;
 
   const letter = resetPasswordLatter(email, user.username, link);
 
@@ -130,9 +130,36 @@ const forgotPassword = async (req, res, next) => {
   });
 };
 
+const resetPassword = async (req, res, next) => {
+  const { token, newPassword } = req.body;
+
+  const resetToken = await Token.findOneAndDelete({ token });
+
+  if (!resetToken) {
+    throw httpError(400, "Invalid or expired password reset token");
+  }
+
+  try {
+    const { _id } = jwt.verify(token, JWT_SECRET);
+
+    const password = await bcrypt.hash(newPassword, 10);
+
+    const result = await User.findByIdAndUpdate(_id, { password });
+
+    if (!result) {
+      throw httpError(400, "Invalid or expired password reset token");
+    }
+
+    res.status(200).json({ message: "Password changed successfully" });
+  } catch {
+    throw httpError(400, "Invalid or expired password reset token");
+  }
+};
+
 export default {
   signup: ctrlWrapper(signup),
   signin: ctrlWrapper(signin),
   signout: ctrlWrapper(signout),
-  forgotPassword: ctrlWrapper(forgotPassword),
+  requestForgotPassword: ctrlWrapper(requestForgotPassword),
+  resetPassword: ctrlWrapper(resetPassword),
 };

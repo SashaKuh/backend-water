@@ -9,6 +9,7 @@ export const resetPasswordLatter = (email, username, link) => {
     html: `    <div
       style="
         background-image: url(https://res.cloudinary.com/dmmsw1ano/image/upload/v1704188253/water-project/public/isdrjnh8hrqscje4p9bx.png);
+        background-color: #ffffff;
         font-family: -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif,
           'Oxygen', 'Ubuntu';
         color: #2f2f2f;
@@ -26,8 +27,7 @@ export const resetPasswordLatter = (email, username, link) => {
       <p>
         If you have received this email, it means that a request has been made
         to reset the password for your account.
-      </p>
-      <p>
+        <br />
         If this was you, please follow the link below to complete the password
         reset process:
       </p>
@@ -50,9 +50,10 @@ export const resetPasswordLatter = (email, username, link) => {
         please disregard this email or promptly contact our support team at
         ${EMAIL}
       </p>
-      <br>
-        Thank you for your understanding and cooperation. <br> Best regards,Water <br>
-        Tracker Support Team.
+      <p>
+        <br />
+        Thank you for your understanding and cooperation.
+        <br />Best regards, <br />Water Tracker Support Team.
       </p>
     </div>`,
   };
