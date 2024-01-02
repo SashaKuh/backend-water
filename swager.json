@@ -152,6 +152,66 @@
         }
       }
     },
+    "/auth/request-reset-password": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Request for reset password",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/bodyResetPasswordRequest"
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Password reset request accepted. Confirmation email has been sent"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          }
+        }
+      }
+    },
+    "/auth/reset-password": {
+      "patch": {
+        "tags": ["auth"],
+        "summary": "Request for reset password",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/bodyResetPassword"
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Password changed successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          }
+        }
+      }
+    },
     "/users/current": {
       "get": {
         "security": [
@@ -305,6 +365,36 @@
           }
         }
       },
+      "bodyResetPasswordRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/resetPasswordRequest"
+            },
+            "examples": {
+              "success": {
+                "$ref": "#/components/examples/passwordRequestData"
+              }
+            }
+          }
+        }
+      },
+      "bodyResetPassword": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/resetPassword"
+            },
+            "examples": {
+              "success": {
+                "$ref": "#/components/examples/passwordResetData"
+              }
+            }
+          }
+        }
+      },
       "bodyUpdate": {
         "required": true,
         "content": {
@@ -414,6 +504,17 @@
           "password": "examplePassword"
         }
       },
+      "passwordRequestData": {
+        "value": {
+          "email": "test@mail.com"
+        }
+      },
+      "passwordResetData": {
+        "value": {
+          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+          "newPassword": "myNewPassword"
+        }
+      },
       "updateData": {
         "value": {
           "email": "newtest@mail.com",
@@ -432,10 +533,12 @@
         "properties": {
           "email": {
             "type": "string",
-            "format": "example@mail.com"
+            "format": "example@mail.com",
+            "example": "test@mail.com"
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "example": "qwerty123456"
           }
         },
         "required": ["email", "password"]
@@ -445,25 +548,25 @@
         "properties": {
           "email": {
             "type": "string",
-            "examples": ["test@mail.com"]
+            "example": "test@mail.com"
           },
           "username": {
             "type": "string",
-            "examples": ["test"]
+            "example": "test"
           },
           "gender": {
             "type": "string",
             "enum": ["girl", "man"],
-            "default": "girl"
+            "default": "girl",
+            "example": "man"
           },
           "avatar": {
             "type": "object",
             "properties": {
               "URL": {
                 "type": "string",
-                "examples": [
-                  "https://s.gravatar.com/avatar/db16583ea34f55e2250f96a83f00d5b7?s=250&r=g&d=retro"
-                ],
+                "example": "https://s.gravatar.com/avatar/db16583ea34f55e2250f96a83f00d5b7?s=250&r=g&d=retro",
+
                 "default": "https://s.gravatar.com/avatar/..."
               }
             }
@@ -472,13 +575,12 @@
             "type": "number",
             "default": 2000,
             "maximum": 15000,
-            "minimum": 0
+            "minimum": 0,
+            "example": 30000
           },
           "token": {
             "type": "string",
-            "examples": [
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-            ]
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
           }
         }
       },
@@ -487,28 +589,56 @@
         "properties": {
           "email": {
             "type": "string",
-            "format": "example@mail.com"
+            "format": "example@mail.com",
+            "example": "testmail@mail.com"
           },
           "password": {
             "type": "object",
-            "required": false,
+            "required": ["oldPassword", "newPassword"],
             "properties": {
               "oldPassword": {
                 "type": "string",
-                "required": true
+                "example": "myOldPassword1234"
               },
               "newPassword": {
                 "type": "string",
-                "required": true
+                "example": "newPass4321"
               }
             }
           },
           "username": {
-            "type": "string"
+            "type": "string",
+            "example": "Sasha"
           },
           "gender": {
             "type": "string",
-            "enum": ["girl", "man"]
+            "enum": ["girl", "man"],
+            "example": "man"
+          }
+        }
+      },
+      "resetPasswordRequest": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "example@mail.com",
+            "example": "testmail@mail.com"
+          }
+        }
+      },
+      "resetPassword": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+          },
+          "newPassword": {
+            "type": "string",
+            "example": "newPass4321"
           }
         }
       }
