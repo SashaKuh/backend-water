@@ -118,7 +118,7 @@ const forgotPassword = async (req, res, next) => {
     token: hashedToken,
   });
 
-  const link = `${FRONTEND_URL}passwordReset?token=${resetToken}&id=${user._id}`;
+  const link = `${FRONTEND_URL}password-reset?token=${resetToken}&id=${user._id}`;
 
   const letter = resetPasswordLatter(email, user.username, link);
 
