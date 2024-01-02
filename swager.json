@@ -152,6 +152,36 @@
         }
       }
     },
+    "/auth/reset-password": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Request for reset password",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/bodyResetPasswordRequest"
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Password reset request accepted. Confirmation email has been sent"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          }
+        }
+      }
+    },
     "/users/current": {
       "get": {
         "security": [
@@ -305,6 +335,21 @@
           }
         }
       },
+      "bodyResetPasswordRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/resetPasswordRequest"
+            },
+            "examples": {
+              "success": {
+                "$ref": "#/components/examples/passwordRequestData"
+              }
+            }
+          }
+        }
+      },
       "bodyUpdate": {
         "required": true,
         "content": {
@@ -414,6 +459,11 @@
           "password": "examplePassword"
         }
       },
+      "passwordRequestData": {
+        "value": {
+          "email": "test@mail.com"
+        }
+      },
       "updateData": {
         "value": {
           "email": "newtest@mail.com",
@@ -491,15 +541,13 @@
           },
           "password": {
             "type": "object",
-            "required": false,
+            "required": ["oldPassword", "newPassword"],
             "properties": {
               "oldPassword": {
-                "type": "string",
-                "required": true
+                "type": "string"
               },
               "newPassword": {
-                "type": "string",
-                "required": true
+                "type": "string"
               }
             }
           },
@@ -509,6 +557,16 @@
           "gender": {
             "type": "string",
             "enum": ["girl", "man"]
+          }
+        }
+      },
+      "resetPasswordRequest": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "example@mail.com"
           }
         }
       }

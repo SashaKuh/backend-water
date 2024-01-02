@@ -4,8 +4,12 @@ import bcrypt from "bcrypt";
 import "dotenv/config.js";
 import { ctrlWrapper, httpError } from "../decorators/index.js";
 import User from "../models/users.js";
+import Token from "../models/token.js";
+import { sendMail } from "../helpers/index.js";
+import { resetPasswordLatter } from "../helpers/mailLatters.js";
+import crypto from "crypto";
 
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET, FRONTEND_URL } = process.env;
 
 const signup = async (req, res, next) => {
   const { email, password } = req.body;
@@ -94,13 +98,41 @@ const signout = async (req, res, next) => {
   res.status(204).send();
 };
 
-// const forgotPassword = (req, res, next) => {
-//   const { email } = req.body;
-// };
+const forgotPassword = async (req, res, next) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw httpError(400, "User with this email does not exist");
+  }
+
+  const token = await Token.findOne({ userId: user._id });
+  if (token) {
+    await Token.findOneAndDelete({ userId: user._id });
+  }
+
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  const hashedToken = await bcrypt.hash(resetToken, 10);
+
+  await Token.create({
+    userId: user._id,
+    token: hashedToken,
+  });
+
+  const link = `${FRONTEND_URL}passwordReset?token=${resetToken}&id=${user._id}`;
+
+  const letter = resetPasswordLatter(email, user.username, link);
+
+  await sendMail(letter);
+
+  res.status(202).json({
+    message:
+      "Password reset request accepted. Confirmation email has been sent.",
+  });
+};
 
 export default {
   signup: ctrlWrapper(signup),
   signin: ctrlWrapper(signin),
   signout: ctrlWrapper(signout),
-  // forgotPassword: ctrlWrapper(forgotPassword),
+  forgotPassword: ctrlWrapper(forgotPassword),
 };

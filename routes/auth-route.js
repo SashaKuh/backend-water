@@ -1,7 +1,10 @@
 import express from "express";
 import authController from "../controllers/auth-controller.js";
 import validateBody from "../decorators/validateBody.js";
-import { authUserSchema } from "../schemas/user-shemas.js";
+import {
+  authForgotPasswordSchema,
+  authUserSchema,
+} from "../schemas/user-shemas.js";
 import { isEmptyBody } from "../helpers/index.js";
 import { authenticate } from "../middlewars/index.js";
 
@@ -23,6 +26,11 @@ authRoute.post(
 
 authRoute.post("/signout", authenticate, authController.signout);
 
-// authRoute.put("/password", isEmptyBody, validateBody(authUserSchema), authController.forgotPassword);
+authRoute.post(
+  "/reset-password",
+  isEmptyBody,
+  validateBody(authForgotPasswordSchema),
+  authController.forgotPassword
+);
 
 export default authRoute;
