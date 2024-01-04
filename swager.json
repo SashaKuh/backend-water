@@ -26,7 +26,7 @@
     },
     {
       "name": "water",
-      "description": "Напиши тут щось :D"
+      "description": "Managing information about consumed water"
     }
   ],
   "paths": {

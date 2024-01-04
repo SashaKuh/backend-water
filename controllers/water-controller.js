@@ -52,10 +52,10 @@ const deleteEntry = async (req, res, next) => {
 };
 
 const getToday = async (req, res, next) => {
-  const { date } = req.body;
+  const { date } = req.params;
   const { _id: owner } = req.user;
 
-  const todayRegex = new RegExp(date.split("T")[0]);
+  const todayRegex = new RegExp(date);
 
   const entries = await Entry.aggregate([
     { $match: { date: { $regex: todayRegex }, owner } },
@@ -86,10 +86,10 @@ const getToday = async (req, res, next) => {
 };
 
 const getMonth = async (req, res, next) => {
-  const { date } = req.body;
+  const { date } = req.params;
   const { _id: owner } = req.user;
 
-  const dateSplitted = date.split("T")[0].substring(0, 7).split("-");
+  const dateSplitted = date.substring(0, 7).split("-");
   const amountOfDays = generateDays(dateSplitted[0], dateSplitted[1]);
 
   const monthRegex = new RegExp(dateSplitted.join("-"));

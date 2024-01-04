@@ -47,10 +47,3 @@ export const waterEditSchema = Joi.object({
     .required()
     .messages(errorMessage("date")),
 });
-
-export const waterDateSchema = Joi.object({
-  date: Joi.string()
-    .pattern(dateRegex)
-    .required()
-    .messages(errorMessage("date")),
-});
