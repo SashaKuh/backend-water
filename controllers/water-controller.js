@@ -33,6 +33,7 @@ const addEntry = async (req, res) => {
   }
   const result = await Entry.create({ ...req.body, dailyNorma, owner });
   res.json({
+    _id: result._id,
     waterVolume: result.waterVolume,
     date: result.date,
   });
@@ -50,6 +51,7 @@ const editEntry = async (req, res, next) => {
     return next(httpError(404, "Not found"));
   }
   res.json({
+    _id: result._id,
     waterVolume: result.waterVolume,
     date: result.date,
   });
@@ -134,7 +136,7 @@ const getMonth = async (req, res, next) => {
         date: {
           $concat: [
             formatMonth(dateSplitted[1] - 1),
-            ",",
+            ", ",
             { $toString: { $dayOfMonth: { $toDate: "$date" } } },
           ],
         },

@@ -391,32 +391,11 @@
         "tags": ["water"],
         "summary": "Add entry about consumed water",
         "requestBody": {
-          "required": true,
-          "description": "Water volume and date of consuming",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                "waterVolume": {
-                  "type": "number",
-                  "default": 0,
-                  "maximum": 1500,
-                  "minimum": 0,
-                  "example": 500
-                 },
-                 "date": {
-                  "type": "string",
-                  "format": "date-time"
-                 }
-                }
-              }
-            }
-          }
+          "$ref": "#/components/requestBodies/addEntry"
         },
         "responses": {
-          "201": {
-           "description": "Created"
+          "200": {
+           "$ref": "#/components/responses/WaterEntry200"
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
@@ -454,7 +433,8 @@
                  },
                  "date": {
                   "type": "string",
-                  "format": "date-time"
+                  "format": "date-time",
+                  "description": "Date in format YYYY-MM-DD"
                  }
                 }
               }
@@ -463,29 +443,7 @@
         },
         "responses": {
           "200": {
-           "description": "OK",
-            "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                "waterVolume": {
-                  "type": "number",
-                  "default": 0,
-                  "maximum": 1500,
-                  "minimum": 0,
-                  "example": 500
-                 },
-                 "date": {
-                  "type": "string",
-                  "format": "date-time",
-                  "description": "Date in format YYYY-MM-DD"
-                 }
-                }
-              }
-            }
-          }
-
+         "$ref": "#/components/responses/WaterEntry200"
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
@@ -581,6 +539,66 @@
           }
         }
       }
+    },
+    "/water/month/{date}": {
+      "get": {
+        "parameters": [{"in": "path", "name": "date", "schema": {"type": "string", "format": "date"}, "required": true, "description": "Date in format YYYY-MM-DD"}],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["water"],
+        "summary": "Get month stats",
+        "responses": {
+          "200": {
+           "description": "OK",
+           "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                  "_id": {
+                    "type": "number",
+                    "description": "Array element id"
+                  },
+                  "servings": {
+                    "type": "number",
+                    "description": "Number of servings of this day"
+                  },
+                  "date": {
+                    "type": "string",
+                    "description": "Date in format 'Month, Day'"
+                  },
+                  "dailyNorma": {
+                    "type": "number",
+                    "description": "Daily norma in liters"
+                  },
+                  "completed": {
+                    "type": "number",
+                    "description": "Percentage of how fulfilled the norm is"
+                  }
+                  }
+                },
+                "example": [
+                  {"_id": 1, "servings": 3, "date": "May, 1", "dailyNorma": 2, "completed": 95},
+                  {"_id": 2, "servings": 0}
+                ]
+              }
+            }
+           }
+
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -648,6 +666,17 @@
               "success": {
                 "$ref": "#/components/examples/updateData"
               }
+            }
+          }
+        }
+      },
+      "addEntry": {
+        "required": true, 
+        "description": "Water volume and date of consuming",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/schemaAddEntry"
             }
           }
         }
@@ -737,6 +766,33 @@
             }
           }
         }
+      },
+      "WaterEntry200": {
+        "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "string",
+                    "example": "658f4ab858c8f90edb78d600"
+                  },
+                "waterVolume": {
+                  "type": "number",
+                  "default": 0,
+                  "maximum": 1500,
+                  "minimum": 0,
+                  "example": 500
+                 },
+                 "date": {
+                  "type": "string",
+                  "format": "date-time"
+                 }
+                }
+              }
+            }
+          }
       }
     },
     "examples": {
@@ -882,6 +938,24 @@
             "type": "string",
             "example": "newPass4321"
           }
+        }
+      },
+      "schemaAddEntry":{
+        "type": "object",
+        "required": ["waterVolume", "date"],
+        "properties": {
+         "waterVolume": {
+                  "type": "number",
+                  "default": 0,
+                  "maximum": 1500,
+                  "minimum": 0,
+                  "example": 500
+                 },
+                 "date": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Date in format YYYY-MM-DD"
+                 }
         }
       }
     }
