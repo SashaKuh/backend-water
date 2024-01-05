@@ -339,6 +339,248 @@
           }
         }
       }
+    }, 
+    "/water/rate": {
+      "patch": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["water"],
+        "summary": "Update daily norm of water",
+        "requestBody": {
+          "required": true,
+          "description": "Daily norm of water",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                "dailyNorma": {
+                  "type": "number",
+                  "default": 2000,
+                  "maximum": 15000,
+                  "minimum": 0
+                 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+           "$ref": "#/components/responses/UserData200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          }
+        }
+      }
+    },
+    "/water/add": {
+      "post": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["water"],
+        "summary": "Add entry about consumed water",
+        "requestBody": {
+          "required": true,
+          "description": "Water volume and date of consuming",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                "waterVolume": {
+                  "type": "number",
+                  "default": 0,
+                  "maximum": 1500,
+                  "minimum": 0,
+                  "example": 500
+                 },
+                 "date": {
+                  "type": "string",
+                  "format": "date-time"
+                 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+           "description": "Created"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          }
+        }
+      }
+    },
+    "/water/{entryId}": {
+      "put": {
+        "parameters": [{"in": "path", "name": "entryId", "schema": {"type": "string"}, "required": true, "description": "Numeric ID of the entry"}],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["water"],
+        "summary": "Edit entry about consumed water",
+        "requestBody": {
+          "required": true,
+          "description": "Water volume and date of consuming",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                "waterVolume": {
+                  "type": "number",
+                  "default": 0,
+                  "maximum": 1500,
+                  "minimum": 0,
+                  "example": 500
+                 },
+                 "date": {
+                  "type": "string",
+                  "format": "date-time"
+                 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+           "description": "OK",
+            "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                "waterVolume": {
+                  "type": "number",
+                  "default": 0,
+                  "maximum": 1500,
+                  "minimum": 0,
+                  "example": 500
+                 },
+                 "date": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Date in format YYYY-MM-DD"
+                 }
+                }
+              }
+            }
+          }
+
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          }
+        }
+      },
+      "delete": {
+        "parameters": [{"in": "path", "name": "entryId", "schema": {"type": "string"}, "required": true, "description": "Numeric ID of the entry"}],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["water"],
+        "summary": "Delete entry about consumed water",
+        "responses": {
+          "204": {
+           "description": "No content"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          }
+        }
+      }
+    },
+    "/water/today/{date}": {
+      "get": {
+        "parameters": [{"in": "path", "name": "date", "schema": {"type": "string", "format": "date"}, "required": true, "description": "Date in format YYYY-MM-DD"}],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": ["water"],
+        "summary": "Get today entries",
+        "responses": {
+          "200": {
+           "description": "OK",
+           "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "entries": {
+                      "type": "array", 
+                      "items": {
+                        "type": "object", 
+                        "properties": {
+                          "_id": {
+                            "type": "string", 
+                            "example": "658f5688afe1676a87a10b14"
+                          },
+                          "waterVolume": {
+                             "type": "number",
+                             "default": 0,
+                              "maximum": 1500,
+                              "minimum": 0,
+                              "example": 1000   
+                          }, 
+                          "date": {
+                            "type": "string", 
+                            "format": "date-time",
+                            "description": "Date in format YYYY-MM-DD"
+                          }
+                        }
+                      }
+                    },
+                    "completed": {
+                      "type": "number",
+                      "example": 25,
+                      "description": "Percentage of how fulfilled the norm is"
+                    }
+                  }
+                }
+              }
+            }
+           }
+
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          }
+        }
+      }
     }
   },
   "components": {

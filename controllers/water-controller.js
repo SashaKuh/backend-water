@@ -14,7 +14,15 @@ const rateDaily = async (req, res, next) => {
   if (!result) {
     return next(httpError(404, "Not found"));
   }
-  res.json(result);
+  res.json({
+    email: result.email,
+    username: result.username,
+    gender: result.gender,
+    avatar: {
+      URL: result.avatar.URL,
+    },
+    dailyNorma: result.dailyNorma,
+  });
 };
 
 const addEntry = async (req, res) => {
@@ -23,8 +31,11 @@ const addEntry = async (req, res) => {
   if (!dailyNorma) {
     return next(httpError(404, "Not found"));
   }
-  await Entry.create({ ...req.body, dailyNorma, owner });
-  res.status(201).send();
+  const result = await Entry.create({ ...req.body, dailyNorma, owner });
+  res.json({
+    waterVolume: result.waterVolume,
+    date: result.date,
+  });
 };
 
 const editEntry = async (req, res, next) => {
@@ -38,7 +49,10 @@ const editEntry = async (req, res, next) => {
   if (!result) {
     return next(httpError(404, "Not found"));
   }
-  res.json(result);
+  res.json({
+    waterVolume: result.waterVolume,
+    date: result.date,
+  });
 };
 
 const deleteEntry = async (req, res, next) => {
