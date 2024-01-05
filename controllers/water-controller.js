@@ -14,7 +14,15 @@ const rateDaily = async (req, res, next) => {
   if (!result) {
     return next(httpError(404, "Not found"));
   }
-  res.json(result);
+  res.json({
+    email: result.email,
+    username: result.username,
+    gender: result.gender,
+    avatar: {
+      URL: result.avatar.URL,
+    },
+    dailyNorma: result.dailyNorma,
+  });
 };
 
 const addEntry = async (req, res) => {
@@ -23,8 +31,12 @@ const addEntry = async (req, res) => {
   if (!dailyNorma) {
     return next(httpError(404, "Not found"));
   }
-  await Entry.create({ ...req.body, dailyNorma, owner });
-  res.status(201).send();
+  const result = await Entry.create({ ...req.body, dailyNorma, owner });
+  res.json({
+    _id: result._id,
+    waterVolume: result.waterVolume,
+    date: result.date,
+  });
 };
 
 const editEntry = async (req, res, next) => {
@@ -38,7 +50,11 @@ const editEntry = async (req, res, next) => {
   if (!result) {
     return next(httpError(404, "Not found"));
   }
-  res.json(result);
+  res.json({
+    _id: result._id,
+    waterVolume: result.waterVolume,
+    date: result.date,
+  });
 };
 
 const deleteEntry = async (req, res, next) => {
@@ -52,10 +68,10 @@ const deleteEntry = async (req, res, next) => {
 };
 
 const getToday = async (req, res, next) => {
-  const { date } = req.body;
+  const { date } = req.params;
   const { _id: owner } = req.user;
 
-  const todayRegex = new RegExp(date.split("T")[0]);
+  const todayRegex = new RegExp(date);
 
   const entries = await Entry.aggregate([
     { $match: { date: { $regex: todayRegex }, owner } },
@@ -86,10 +102,10 @@ const getToday = async (req, res, next) => {
 };
 
 const getMonth = async (req, res, next) => {
-  const { date } = req.body;
+  const { date } = req.params;
   const { _id: owner } = req.user;
 
-  const dateSplitted = date.split("T")[0].substring(0, 7).split("-");
+  const dateSplitted = date.substring(0, 7).split("-");
   const amountOfDays = generateDays(dateSplitted[0], dateSplitted[1]);
 
   const monthRegex = new RegExp(dateSplitted.join("-"));
@@ -120,7 +136,7 @@ const getMonth = async (req, res, next) => {
         date: {
           $concat: [
             formatMonth(dateSplitted[1] - 1),
-            ",",
+            ", ",
             { $toString: { $dayOfMonth: { $toDate: "$date" } } },
           ],
         },
