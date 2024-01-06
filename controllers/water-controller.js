@@ -15,12 +15,6 @@ const rateDaily = async (req, res, next) => {
     return next(httpError(404, "Not found"));
   }
   res.json({
-    email: result.email,
-    username: result.username,
-    gender: result.gender,
-    avatar: {
-      URL: result.avatar.URL,
-    },
     dailyNorma: result.dailyNorma,
   });
 };
@@ -105,7 +99,7 @@ const getMonth = async (req, res, next) => {
   const { date } = req.params;
   const { _id: owner } = req.user;
 
-  const dateSplitted = date.substring(0, 7).split("-");
+  const dateSplitted = date.split("-");
   const amountOfDays = generateDays(dateSplitted[0], dateSplitted[1]);
 
   const monthRegex = new RegExp(dateSplitted.join("-"));
