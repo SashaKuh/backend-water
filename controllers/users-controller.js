@@ -2,8 +2,14 @@ import bcrypt from "bcrypt";
 import { v2 as cloudinary } from "cloudinary";
 import "dotenv/config.js";
 import fs from "fs/promises";
+import path from "path";
 import { ctrlWrapper, httpError } from "../decorators/index.js";
 import User from "../models/users.js";
+import { deleteUserLatter } from "../helpers/mailLatters.js";
+import { sendMail } from "../helpers/index.js";
+import Entry from "../models/water.js";
+
+const { FRONTEND_URL, JWT_SECRET } = process.env;
 
 const current = async (req, res, next) => {
   const { _id } = req.user;
@@ -104,8 +110,49 @@ const updateAvatar = async (req, res, next) => {
     });
 };
 
+export const deleteUserRequest = async (req, res, next) => {
+  const { _id } = req.user;
+  const user = await User.findById(_id);
+
+  const link = path.join(FRONTEND_URL, "delete");
+
+  const letter = deleteUserLatter(
+    "rostyslav.stetsyk1999@gmail.com",
+    user.username,
+    link
+  );
+
+  await sendMail(letter);
+
+  res.status(202).json({
+    message:
+      "Delete account request accepted. Confirmation email has been sent.",
+  });
+};
+
+export const deleteUser = async (req, res, next) => {
+  const { password } = req.params;
+  const { _id } = req.user;
+
+  if (!deleteToken) {
+    throw httpError(400, "Invalid or delete account token");
+  }
+
+  const { password: hashedPassword } = await User.findById(_id);
+  const compare = bcrypt.compare(hashedPassword, password);
+
+  if (!compare) throw httpError(400, "Bad password");
+
+  await User.findByIdAndDelete(_id);
+  await Entry.deleteMany({ owner: _id });
+
+  res.status(204);
+};
+
 export default {
   current: ctrlWrapper(current),
   updateUserData: ctrlWrapper(updateUserData),
   updateAvatar: ctrlWrapper(updateAvatar),
+  deleteUser: ctrlWrapper(deleteUser),
+  deleteUserRequest: ctrlWrapper(deleteUserRequest),
 };

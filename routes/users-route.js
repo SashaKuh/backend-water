@@ -1,7 +1,7 @@
 import express from "express";
 import userController from "../controllers/users-controller.js";
 import validateBody from "../decorators/validateBody.js";
-import { userUpdateSchema } from "../schemas/user-shemas.js";
+import { deleteUserSchema, userUpdateSchema } from "../schemas/user-shemas.js";
 import { isEmptyBody } from "../helpers/index.js";
 import { authenticate, upload } from "../middlewars/index.js";
 
@@ -22,6 +22,20 @@ usersRoute.patch(
   authenticate,
   upload.single("avatar"),
   userController.updateAvatar
+);
+
+usersRoute.post(
+  "/request-delete",
+  authenticate,
+  userController.deleteUserRequest
+);
+
+usersRoute.delete(
+  "/delete/:password",
+  authenticate,
+  isEmptyBody,
+  validateBody(deleteUserSchema),
+  userController.deleteUser
 );
 
 export default usersRoute;

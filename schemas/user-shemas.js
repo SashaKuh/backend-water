@@ -70,3 +70,20 @@ export const authResetPasswordSchema = Joi.object({
     "any.required": "newPassword is required field",
   }),
 });
+
+export const deleteUserSchema = Joi.object({
+  token: Joi.string()
+    .required()
+    .pattern(/[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]/)
+    .messages({
+      "string.pattern.base": "Bad request data1",
+      "any.required": "Bad request data2",
+      "string.base": "Bad request data3",
+    }),
+  password: Joi.string().min(8).max(64).required().messages({
+    "string.base": "Password must be a string",
+    "string.min: ": "Min length 8 symbols",
+    "string.max: ": "Max length 64 symbols",
+    "any.required": "Password is required field",
+  }),
+});
